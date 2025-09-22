@@ -10,6 +10,8 @@ router.post("/notificarMail", async (req, res) => {
 
 
     try {
+        console.log("Data recibida:", data);
+
         const result = await notificarEnvio(data, connection);
         res.status(200).json(result);
     } catch (error) {
