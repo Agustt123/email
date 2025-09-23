@@ -1,22 +1,29 @@
-
+// routes/email.js
 const express = require("express");
 const router = express.Router();
-const { redisClient, getConnection, getCompanyById } = require("../dbconfig");
+const { getConnection } = require("../dbconfig");
 const { notificarEnvio } = require("../controller/email");
+
+// POST /api/notificarMail
 router.post("/notificarMail", async (req, res) => {
-    const data = req.body;
-    const connection = await getConnection(data.idempresa);
+    const { idempresa, idlinea, dataemail } = req.body || {};
 
+    // Validaciones mínimas del payload (lado API)
+    if (!idempresa) {
+        return res.status(400).json({ ok: false, error: "Falta idempresa" });
+    }
+    if (!dataemail?.destinatario?.email) {
+        return res.status(400).json({ ok: false, error: "Falta dataemail.destinatario.email" });
+    }
 
-
+    const connection = await getConnection(idempresa);
     try {
-        console.log("Data recibida:", data);
-
-        const result = await notificarEnvio(data, connection);
+        // Importante: NO usamos dataservidor del body. Se obtiene de la DB + cache interna.
+        const result = await notificarEnvio({ idempresa, idlinea, dataemail }, connection);
         res.status(200).json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+        console.error("notificarMail error:", error);
+        res.status(500).json({ ok: false, error: error.message || String(error) });
     } finally {
         connection.end();
     }
