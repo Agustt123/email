@@ -76,6 +76,50 @@ async function getConnection(idempresa) {
         };
     }
 }
+async function getnombre(idempresa) {
+    try {
+        //     console.log("idempresa recibido:", idempresa);
+
+        // Validación del tipo de idempresa
+        if (typeof idempresa !== 'string' && typeof idempresa !== 'number') {
+            throw new Error(`idempresa debe ser un string o un número, pero es: ${typeof idempresa}`);
+        }
+
+        // Obtener las empresas desde Redis
+        const redisKey = 'empresasData';
+        const empresasData = await getFromRedis(redisKey);
+        if (!empresasData) {
+            throw new Error(`No se encontraron datos de empresas en Redis.`);
+        }
+
+        // console.log("Datos obtenidos desde Redis:", empresasData);
+
+        // Buscar la empresa por su id
+        const empresa = empresasData[String(idempresa)];
+        if (!empresa) {
+            throw new Error(`No se encontró la configuración de la empresa con ID: ${idempresa}`);
+        }
+
+        //    console.log("Configuración de la empresa encontrada:", empresa);
+
+
+
+        return empresa.empresa;
+    } catch (error) {
+        console.error(`Error al obtener la conexión:`, error.message);
+
+        // Lanza un error con una respuesta estándar
+        throw {
+            status: 500,
+            response: {
+                estado: false,
+
+                error: -1,
+
+            },
+        };
+    }
+}
 
 // Función para obtener datos desde Redis
 async function getFromRedis(key) {
@@ -165,4 +209,4 @@ async function getCompanyById(companyId) {
     }
 }
 
-module.exports = { getConnection, getFromRedis, redisClient, getProdDbConfig, executeQuery, getCompanyById };
+module.exports = { getConnection, getFromRedis, redisClient, getProdDbConfig, executeQuery, getCompanyById, getnombre };

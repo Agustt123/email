@@ -1,6 +1,6 @@
 // controller/email.js
 const nodemailer = require('nodemailer');
-const { executeQuery } = require('../dbconfig');
+const { executeQuery, getnombre } = require('../dbconfig');
 const { getCachedSmtp, setCachedSmtp, invalidateSmtp } = require('../lib/smtpCache');
 const { loadSmtpFromDB } = require('../lib/loadSmtpFromDB');
 const { buildTransporterConfig } = require('../lib/buildTransporterConfig');
@@ -40,10 +40,10 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
     } catch (e) {
         return { ok: false, updated: false, error: e.message || String(e) };
     }
-
+    const nombre = await getnombre(idempresa);
     // 2) Preparar mensaje
     const mensaje = {
-        from: fmt({ nombre: 'JN Logística', email: dataservidor.user || 'no-reply@localhost' }),
+        from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
         to: fmt(dataemail.destinatario),
         cc: fmt(dataemail.copia),
         subject: dataemail.asunto || '(sin asunto)',
