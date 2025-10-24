@@ -98,9 +98,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
         ].filter(Boolean).join(' | ');
 
         if (!onlySend) {
-            await executeQuery(connection,
-                "UPDATE envios_historial SET notificado = NOW(), estado = 'ERROR' WHERE id = ?",
-                [idlinea], log).catch(() => { });
+
         }
         return { ok: false, updated: !onlySend, error: errorInfo || 'SMTP error' };
     }
