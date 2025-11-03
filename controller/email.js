@@ -62,7 +62,9 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
         const info = await trySend(dataservidor);
 
         if (!onlySend) {
-            await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
+            //await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
+            await executeQuery(connection, 'UPDATE envios_historial SET email_notificado_fecha = now(), email_notificado_sync = 3 WHERE id =  ?', [idlinea], log);
+
         }
         return { ok: true, updated: !onlySend, messageId: info?.messageId };
 
@@ -79,7 +81,8 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
                 const info2 = await trySend(fresh);
 
                 if (!onlySend) {
-                    await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
+                    //  await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
+                    await executeQuery(connection, 'UPDATE envios_historial SET email_notificado_fecha = now(), email_notificado_sync = 3 WHERE id =  ?', [idlinea], log);
                 }
                 return { ok: true, updated: !onlySend, messageId: info2?.messageId };
             } catch (e2) {
