@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Tu pedido fue despachado</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        img {
+            border: 0;
+            display: block;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+            }
+
+            .padding {
+                padding: 16px !important;
+            }
+
+            .button {
+                width: auto !important;
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #f4f6f8;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+        style="background-color: #f4f6f8;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+
+                <!-- Hero -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="container"
+                    style="background: linear-gradient(135deg, #ff6600, #6a1b9a); border-radius: 16px 16px 0 0;">
+                    <tr>
+                        <td align="center" style="padding: 32px 20px;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold;">Tu compra ya está
+                                en camino 🚚</h1>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Card principal -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="container"
+                    style="background-color: #ffffff;">
+                    <tr>
+                        <td class="padding" style="padding: 28px; color: #111111;">
+                            <p style="font-size: 16px; line-height: 24px; margin: 0 0 16px; color: #111111;">
+                                Hola <strong>{{recipient_name}}</strong>, tu compra en <strong>{{seller_name}}</strong>
+                                fue despachada por <strong>YA Envíos</strong>.
+                            </p>
+                            <p style="font-size: 14px; line-height: 22px; margin: 0 0 24px; color: #555555;">
+                                Pedido <strong>{{order_number}}</strong> • Estado: <strong>Despachado</strong>
+                            </p>
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center"
+                                        style="border-radius: 40px; background: linear-gradient(90deg, #ff6600, #6a1b9a);">
+                                        <a href="{{tracking_url}}" class="button"
+                                            style="background: linear-gradient(90deg, #ff6600, #6a1b9a); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 40px; font-size: 16px; font-weight: bold; display: inline-block; border: 0;">
+                                            📦 SEGUIR MI ENVÍO
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Detalles -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="container"
+                    style="background-color: #f9f9f9; margin-top: 2px;">
+                    <tr>
+                        <td class="padding" style="padding: 24px; color: #111111;">
+                            <h2 style="margin: 0 0 16px; font-size: 18px; color: #6a1b9a; font-weight: bold;">📦
+                                Detalles del paquete</h2>
+                            <p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #333333;">
+                                Transportista: <strong>{{carrier_name}}</strong>
+                            </p>
+                            <p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #333333;">
+                                Nº de seguimiento: <strong>{{tracking_number}}</strong>
+                            </p>
+                            <p style="margin: 0; font-size: 14px; line-height: 20px; color: #333333;">
+                                Destino: <strong>{{recipient_name}}</strong>, {{recipient_address}}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Timeline -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="container"
+                    style="background-color: #ffffff; margin-top: 2px;">
+                    <tr>
+                        <td class="padding" style="padding: 24px; color: #111111;">
+                            <h2 style="margin: 0 0 16px; font-size: 18px; color: #ff6600; font-weight: bold;">🚀
+                                Progreso del envío</h2>
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 14px; line-height: 20px; color: #333333;">
+                                        ✓ Despachado — {{shipped_date}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 14px; line-height: 20px; color: #333333;">
+                                        🚚 En tránsito — {{in_transit_date}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Contacto -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="container"
+                    style="background-color: #f9f9f9; margin-top: 2px;">
+                    <tr>
+                        <td class="padding" style="padding: 24px; color: #111111;">
+                            <h2 style="margin: 0 0 16px; font-size: 18px; color: #6a1b9a; font-weight: bold;">💬
+                                ¿Necesitás ayuda?</h2>
+                            <p style="margin: 0; font-size: 14px; line-height: 20px; color: #333333;">
+                                📧 <a href="mailto:{{support_email}}"
+                                    style="color: #ff6600; text-decoration: none;">contacto@yaenvios.com.ar</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Footer -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="container"
+                    style="background-color: #111111; border-radius: 0 0 16px 16px; margin-top: 2px;">
+                    <tr>
+                        <td align="center"
+                            style="padding: 24px 20px; font-size: 12px; line-height: 18px; color: #ffffff;">
+                            Envío gestionado por YA Envíos para {{seller_name}}.<br>
+                            <a href="{{preferences_url}}" style="color: #ff6600; text-decoration: none;">Gestionar
+                                preferencias</a> •
+                            <a href="{{privacy_url}}" style="color: #ff6600; text-decoration: none;">Privacidad</a>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

@@ -4,6 +4,7 @@ const { executeQuery, getnombre } = require('../dbconfig');
 const { getCachedSmtp, setCachedSmtp, invalidateSmtp } = require('../lib/smtpCache');
 const { loadSmtpFromDB } = require('../lib/loadSmtpFromDB');
 const { buildTransporterConfig } = require('../lib/buildTransporterConfig');
+const { renderTemplate } = require('../lib/renderTemplate');
 
 const isHtml = (s = '') => /<\/?[a-z][\s\S]*>/i.test(s);
 const toHtml = (s = '') => (isHtml(s) ? s : `<p>${s.replace(/\n/g, '<br>')}</p>`);
@@ -15,13 +16,13 @@ const fmt = (p) => (p?.nombre ? `"${p.nombre}" <${p.email}>` : p?.email || undef
  * Si `forceRefresh` es true, ignora el cache y recarga de DB.
  */
 async function getSmtpConfig(connection, idempresa, forceRefresh = false) {
-    if (!forceRefresh) {
-        const cached = getCachedSmtp(idempresa);
-        if (cached) return cached;
-    }
-    const cfg = await loadSmtpFromDB(connection);
-    setCachedSmtp(idempresa, cfg);
-    return cfg;
+  if (!forceRefresh) {
+    const cached = getCachedSmtp(idempresa);
+    if (cached) return cached;
+  }
+  const cfg = await loadSmtpFromDB(connection);
+  setCachedSmtp(idempresa, cfg);
+  return cfg;
 }
 
 /**
@@ -29,82 +30,190 @@ async function getSmtpConfig(connection, idempresa, forceRefresh = false) {
  * Usa cache en memoria por empresa para la config SMTP (mensajes_email).
  */
 async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log = false) {
-    // Validaciones mínimas del email
-    if (!dataemail?.destinatario?.email) return { ok: false, updated: false, error: 'Falta destinatario.email' };
-    const onlySend = Number(idlinea) === -1;
+  // Validaciones mínimas del email
+  if (!dataemail?.destinatario?.email) return { ok: false, updated: false, error: 'Falta destinatario.email' };
+  const onlySend = Number(idlinea) === -1;
 
-    // 1) Traer config (cache >> DB)
-    let dataservidor;
-    try {
-        dataservidor = await getSmtpConfig(connection, idempresa, false);
-    } catch (e) {
-        return { ok: false, updated: false, error: e.message || String(e) };
-    }
-    const nombre = await getnombre(idempresa);
+  // 1) Traer config (cache >> DB)
+  let dataservidor;
+  try {
+    dataservidor = await getSmtpConfig(connection, idempresa, false);
+  } catch (e) {
+    return { ok: false, updated: false, error: e.message || String(e) };
+  }
+  const nombre = await getnombre(idempresa);
+  let mensaje;
+
+  // 2) Preparar mensaje
+
+  if (dataemail.html == true) {
+    console.log("enrtrerer");
+
+
+    const html = renderTemplate('envio_despachado.html', {
+      recipient_name: dataemail?.destinatario?.nombre || 'Cliente',
+      seller_name: nombre,
+      order_number: dataemail?.pedido || '—',
+      tracking_url: dataemail?.tracking_url || '#',
+      carrier_name: 'YA Envíos',
+      tracking_number: dataemail?.tracking_number || '—',
+      recipient_address: dataemail?.direccion || '',
+      shipped_date: dataemail?.shipped_date || '',
+      in_transit_date: dataemail?.in_transit_date || '',
+      support_email: 'contacto@yaenvios.com.ar',
+      preferences_url: '#',
+      privacy_url: '#',
+    });
     // 2) Preparar mensaje
-    const mensaje = {
-        from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
-        to: fmt(dataemail.destinatario),
-        cc: fmt(dataemail.copia),
-        subject: dataemail.asunto || '(sin asunto)',
-        html: toHtml(dataemail.cuerpo || ''),
-        text: toText(dataemail.cuerpo || ''),
+    mensaje = {
+      from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
+      to: fmt(dataemail.destinatario),
+      cc: fmt(dataemail.copia),
+      subject: dataemail.asunto || 'Tu pedido fue despachado 🚚',
+      html,
+      text: toText(html),
     };
-
-    // Función interna para enviar con una config dada
-    async function trySend(ds) {
-        const transporter = nodemailer.createTransport(buildTransporterConfig(ds));
-        return transporter.sendMail(mensaje);
+  } else {
+    mensaje = {
+      from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
+      to: fmt(dataemail.destinatario),
+      cc: fmt(dataemail.copia),
+      subject: dataemail.asunto || '(sin asunto)',
+      html: `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de envío - Moova</title>
+  <style>
+    body, table, td, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table, td { border-collapse:collapse !important; }
+    body {
+      margin:0; padding:0; width:100%!important; height:100%!important;
+      font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color:#edf2f7; color:#333333;
     }
+    a { text-decoration:none; color:#2b6cb0; }
+    img { border:0; outline:none; text-decoration:none; display:block; max-width:100%; height:auto; }
+    @media screen and (max-width:600px) {
+      .container { width:100%!important; padding:20px!important; }
+      .btn { width:100%!important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0;">
+  <table width="100%" bgcolor="#edf2f7" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center">
+        <table width="600" class="container" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin-top:40px; margin-bottom:40px; border-radius:6px; overflow:hidden;">
+          <tr>
+            <td align="center" style="padding:30px 20px 10px;">
+              <img src="https://moova.io/static/media/logo-moova.3b88a5a9.svg" alt="Moova" width="100" />
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:10px 30px;">
+              <h2 style="font-size:18px; font-weight:600; color:#222;">¡Hola Christian Marassi!</h2>
+              <p style="font-size:15px; line-height:22px; margin:10px 0 0;">Tus pedidos ya están confirmados para ser entregados por nuestros Moovers.</p>
+              <p style="font-size:15px; line-height:22px;">Podés realizar el seguimiento del envío desde aquí:</p>
+              <a href="#" class="btn" style="background-color:#1a202c; color:#ffffff; display:inline-block; padding:12px 24px; border-radius:4px; font-weight:600; margin-top:10px;">Seguir envío</a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:30px 30px 0;">
+              <p style="font-size:14px; color:#555;">Ante cualquier duda, escribinos a través de nuestro <a href="#" style="color:#3182ce;">chat</a>.</p>
+              <p style="font-size:14px; color:#555;">¡Gracias!<br>El Equipo de Moova</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e2e8f0; margin-top:10px; padding-top:10px;">
+                <tr>
+                  <td style="font-size:13px; color:#333;"><strong>Cantidad</strong></td>
+                  <td style="font-size:13px; color:#333;"><strong>Descripción</strong></td>
+                </tr>
+                <tr>
+                  <td style="font-size:13px; color:#555; padding-top:6px;">1</td>
+                  <td style="font-size:13px; color:#555; padding-top:6px;">
+                    Zapatillas Converse Chuck Taylor Hi Blanco Animal Print - 36.5
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:10px 30px 30px;">
+              <a href="#" style="font-size:12px; color:#a0aec0;">No recibir más notificaciones sobre este envío</a>
+            </td>
+          </tr>
+        </table>
+        <p style="font-size:11px; color:#a0aec0; text-align:center;">© 2025. All rights reserved.</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `,
+      text: toText(dataemail.cuerpo || ''),
+    };
+  }
 
-    try {
-        // 3) Primer intento con cache/DB
-        const info = await trySend(dataservidor);
+
+  // Función interna para enviar con una config dada
+  async function trySend(ds) {
+    const transporter = nodemailer.createTransport(buildTransporterConfig(ds));
+    return transporter.sendMail(mensaje);
+  }
+
+  try {
+    // 3) Primer intento con cache/DB
+    const info = await trySend(dataservidor);
+
+    if (!onlySend) {
+      //await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
+      await executeQuery(connection, 'UPDATE envios_historial SET email_notificado_fecha = now(), email_notificado_sync = 3 WHERE id =  ?', [idlinea], log);
+
+    }
+    return { ok: true, updated: !onlySend, messageId: info?.messageId };
+
+  } catch (e1) {
+    // 4) Si falla por auth/conexión, invalidar cache y reintentar 1 vez forzando refresh
+    const transient =
+      ['EAUTH', 'ECONNECTION', 'ETIMEDOUT', 'ESOCKET', 'EDNS', 'ECONNRESET'].includes(e1.code) ||
+      [421, 454, 534, 535, 530].includes(e1.responseCode);
+
+    if (transient) {
+      try {
+        invalidateSmtp(idempresa);
+        const fresh = await getSmtpConfig(connection, idempresa, true);
+        const info2 = await trySend(fresh);
 
         if (!onlySend) {
-            //await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
-            await executeQuery(connection, 'UPDATE envios_historial SET email_notificado_fecha = now(), email_notificado_sync = 3 WHERE id =  ?', [idlinea], log);
-
+          //  await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
+          await executeQuery(connection, 'UPDATE envios_historial SET email_notificado_fecha = now(), email_notificado_sync = 3 WHERE id =  ?', [idlinea], log);
         }
-        return { ok: true, updated: !onlySend, messageId: info?.messageId };
-
-    } catch (e1) {
-        // 4) Si falla por auth/conexión, invalidar cache y reintentar 1 vez forzando refresh
-        const transient =
-            ['EAUTH', 'ECONNECTION', 'ETIMEDOUT', 'ESOCKET', 'EDNS', 'ECONNRESET'].includes(e1.code) ||
-            [421, 454, 534, 535, 530].includes(e1.responseCode);
-
-        if (transient) {
-            try {
-                invalidateSmtp(idempresa);
-                const fresh = await getSmtpConfig(connection, idempresa, true);
-                const info2 = await trySend(fresh);
-
-                if (!onlySend) {
-                    //  await executeQuery(connection, 'UPDATE envios_historial SET notificado = NOW() WHERE id = ?', [idlinea], log);
-                    await executeQuery(connection, 'UPDATE envios_historial SET email_notificado_fecha = now(), email_notificado_sync = 3 WHERE id =  ?', [idlinea], log);
-                }
-                return { ok: true, updated: !onlySend, messageId: info2?.messageId };
-            } catch (e2) {
-                // cae al manejo común abajo
-                e1.message = `${e1.message} | retry_failed: ${e2.message || e2}`;
-            }
-        }
-
-        // 5) Marcar ERROR cuando corresponde y devolver detalle
-        const errorInfo = [
-            e1.code && `code=${e1.code}`,
-            e1.responseCode && `smtp=${e1.responseCode}`,
-            e1.command && `cmd=${e1.command}`,
-            e1.response && `resp=${e1.response}`,
-            e1.message && `msg=${e1.message}`,
-        ].filter(Boolean).join(' | ');
-
-        if (!onlySend) {
-
-        }
-        return { ok: false, updated: !onlySend, error: errorInfo || 'SMTP error' };
+        return { ok: true, updated: !onlySend, messageId: info2?.messageId };
+      } catch (e2) {
+        // cae al manejo común abajo
+        e1.message = `${e1.message} | retry_failed: ${e2.message || e2}`;
+      }
     }
+
+    // 5) Marcar ERROR cuando corresponde y devolver detalle
+    const errorInfo = [
+      e1.code && `code=${e1.code}`,
+      e1.responseCode && `smtp=${e1.responseCode}`,
+      e1.command && `cmd=${e1.command}`,
+      e1.response && `resp=${e1.response}`,
+      e1.message && `msg=${e1.message}`,
+    ].filter(Boolean).join(' | ');
+
+    if (!onlySend) {
+
+    }
+    return { ok: false, updated: !onlySend, error: errorInfo || 'SMTP error' };
+  }
 }
 
 module.exports = { notificarEnvio };
