@@ -1,6 +1,5 @@
 const mysql = require('mysql');
 const redis = require('redis');
-
 const redisClient = redis.createClient({
     socket: {
         host: '192.99.190.137',
@@ -8,6 +7,10 @@ const redisClient = redis.createClient({
     },
     password: 'sdJmdxXC8luknTrqmHceJS48NTyzExQg',
 });
+redisClient.on('reconnecting', () => console.log('Redis: reintentando...'));
+redisClient.on('connect', () => console.log('Redis: TCP conectado'));
+redisClient.on('ready', () => console.log('Redis: ready'));
+redisClient.on('end', () => console.log('Redis: conexión cerrada'));
 
 redisClient.on('error', (err) => {
     console.error('Error al conectar con Redis:', err);
