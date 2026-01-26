@@ -17,6 +17,7 @@ router.post("/notificarMail", async (req, res) => {
     }
 
     const connection = await getConnection(idempresa);
+
     try {
         // Importante: NO usamos dataservidor del body. Se obtiene de la DB + cache interna.
         const result = await notificarEnvio({ idempresa, idlinea, dataemail }, connection);
