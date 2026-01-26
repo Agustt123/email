@@ -162,8 +162,47 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
 
   // Función interna para enviar con una config dada
   async function trySend(ds) {
-    const transporter = nodemailer.createTransport(buildTransporterConfig(ds));
-    return transporter.sendMail(mensaje);
+    const portsToTry = [];
+
+    // 1) primero el puerto que venga en ds
+    if (ds.port || ds.puerto) portsToTry.push(Number(ds.puerto ?? ds.port));
+
+    // 2) fallback típico
+    if (!portsToTry.includes(587)) portsToTry.push(587);
+    if (!portsToTry.includes(465)) portsToTry.push(465);
+
+    let lastErr;
+
+    for (const p of portsToTry) {
+      try {
+        const attempt = { ...ds, port: p, puerto: p };
+        const cfg = buildTransporterConfig(attempt);
+
+        const transporter = nodemailer.createTransport(cfg);
+
+        // verify ayuda a fallar rápido si no hay saludo/auth
+        await transporter.verify();
+
+        return await transporter.sendMail(mensaje);
+      } catch (err) {
+        lastErr = err;
+
+        const code = String(err?.code || "");
+        const msg = String(err?.message || "");
+
+        const retryable =
+          code === "ETIMEDOUT" ||
+          code === "ECONNRESET" ||
+          code === "ESOCKET" ||
+          msg.includes("Greeting never received") ||
+          msg.includes("CONN");
+
+        // si no es retryable (ej: auth), cortamos
+        if (!retryable) break;
+      }
+    }
+
+    throw lastErr;
   }
 
   try {
