@@ -85,7 +85,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmación de envío - Moova</title>
+  <title>Confirmación de envío </title>
   <style>
     body, table, td, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
     table, td { border-collapse:collapse !important; }
@@ -109,13 +109,13 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
         <table width="600" class="container" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin-top:40px; margin-bottom:40px; border-radius:6px; overflow:hidden;">
           <tr>
             <td align="center" style="padding:30px 20px 10px;">
-              <img src="https://moova.io/static/media/logo-moova.3b88a5a9.svg" alt="Moova" width="100" />
+             
             </td>
           </tr>
           <tr>
             <td align="center" style="padding:10px 30px;">
               <h2 style="font-size:18px; font-weight:600; color:#222;">¡Hola Christian Marassi!</h2>
-              <p style="font-size:15px; line-height:22px; margin:10px 0 0;">Tus pedidos ya están confirmados para ser entregados por nuestros Moovers.</p>
+              <p style="font-size:15px; line-height:22px; margin:10px 0 0;">Tus pedidos ya están confirmados para ser entregados por nuestros choferes.</p>
               <p style="font-size:15px; line-height:22px;">Podés realizar el seguimiento del envío desde aquí:</p>
               <a href="#" class="btn" style="background-color:#1a202c; color:#ffffff; display:inline-block; padding:12px 24px; border-radius:4px; font-weight:600; margin-top:10px;">Seguir envío</a>
             </td>
@@ -123,7 +123,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
           <tr>
             <td align="center" style="padding:30px 30px 0;">
               <p style="font-size:14px; color:#555;">Ante cualquier duda, escribinos a través de nuestro <a href="#" style="color:#3182ce;">chat</a>.</p>
-              <p style="font-size:14px; color:#555;">¡Gracias!<br>El Equipo de Moova</p>
+              <p style="font-size:14px; color:#555;">¡Gracias!p>
             </td>
           </tr>
           <tr>
