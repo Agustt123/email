@@ -114,7 +114,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
           </tr>
           <tr>
             <td align="center" style="padding:10px 30px;">
-              <p style="font-size:15px; line-height:22px; margin:10px 0 0;"><!${dataemail?.cuerpo || ''}></p>
+              <p style="font-size:15px; line-height:22px; margin:10px 0 0;">${dataemail?.cuerpo || ''}</p>
             </td>
           </tr>
           <tr>
