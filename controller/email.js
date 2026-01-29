@@ -114,7 +114,10 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
           </tr>
           <tr>
             <td align="center" style="padding:10px 30px;">
-              <h2 style="font-size:18px; font-weight:600; color:#222;">¡Hola Christian Marassi!</h2>
+            <h2 style="font-size:18px; font-weight:600; color:#222;">
+           ¡Hola ${dataemail?.cuerpo || 'Cliente'}!
+</h2>
+
               <p style="font-size:15px; line-height:22px; margin:10px 0 0;">Tus pedidos ya están confirmados para ser entregados por nuestros choferes.</p>
               <p style="font-size:15px; line-height:22px;">Podés realizar el seguimiento del envío desde aquí:</p>
               <a href="#" class="btn" style="background-color:#1a202c; color:#ffffff; display:inline-block; padding:12px 24px; border-radius:4px; font-weight:600; margin-top:10px;">Seguir envío</a>
@@ -123,7 +126,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
           <tr>
             <td align="center" style="padding:30px 30px 0;">
               <p style="font-size:14px; color:#555;">Ante cualquier duda, escribinos a través de nuestro <a href="#" style="color:#3182ce;">chat</a>.</p>
-              <p style="font-size:14px; color:#555;">¡Gracias!p>
+              <p style="font-size:14px; color:#555;">¡Gracias!>
             </td>
           </tr>
           <tr>
