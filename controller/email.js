@@ -109,41 +109,21 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
         <table width="600" class="container" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin-top:40px; margin-bottom:40px; border-radius:6px; overflow:hidden;">
           <tr>
             <td align="center" style="padding:30px 20px 10px;">
-             
+
             </td>
           </tr>
           <tr>
             <td align="center" style="padding:10px 30px;">
-            <h2 style="font-size:18px; font-weight:600; color:#222;">
-           ¡Hola ${dataemail?.cuerpo || 'Cliente'}!
-</h2>
-
-              <p style="font-size:15px; line-height:22px; margin:10px 0 0;">Tus pedidos ya están confirmados para ser entregados por nuestros choferes.</p>
-              <p style="font-size:15px; line-height:22px;">Podés realizar el seguimiento del envío desde aquí:</p>
-              <a href="#" class="btn" style="background-color:#1a202c; color:#ffffff; display:inline-block; padding:12px 24px; border-radius:4px; font-weight:600; margin-top:10px;">Seguir envío</a>
+              <p style="font-size:15px; line-height:22px; margin:10px 0 0;"><!${dataemail?.cuerpo || ''}></p>
             </td>
           </tr>
           <tr>
             <td align="center" style="padding:30px 30px 0;">
-              <p style="font-size:14px; color:#555;">Ante cualquier duda, escribinos a través de nuestro <a href="#" style="color:#3182ce;">chat</a>.</p>
-              <p style="font-size:14px; color:#555;">¡Gracias!>
+              <p style="font-size:14px; color:#555;">Ante cualquier duda, contactanos.</p>
+              <p style="font-size:14px; color:#555;">¡Gracias!<p>
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e2e8f0; margin-top:10px; padding-top:10px;">
-                <tr>
-                  <td style="font-size:13px; color:#333;"><strong>Cantidad</strong></td>
-                  <td style="font-size:13px; color:#333;"><strong>Descripción</strong></td>
-                </tr>
-                <tr>
-                  <td style="font-size:13px; color:#555; padding-top:6px;">1</td>
-                  <td style="font-size:13px; color:#555; padding-top:6px;">
-                    Zapatillas Converse Chuck Taylor Hi Blanco Animal Print - 36.5
-                  </td>
-                </tr>
-              </table>
-            </td>
           </tr>
           <tr>
             <td align="center" style="padding:10px 30px 30px;">
