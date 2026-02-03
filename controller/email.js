@@ -24,7 +24,6 @@ async function getSmtpConfig(connection, idempresa, forceRefresh = false) {
   setCachedSmtp(idempresa, cfg);
   return cfg;
 }
-
 /**
  * Envía un mail por SMTP y, salvo que idlinea == -1, actualiza envios_historial.
  * Usa cache en memoria por empresa para la config SMTP (mensajes_email).
@@ -43,7 +42,6 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
   }
   const nombre = await getnombre(idempresa);
   let mensaje;
-
   // 2) Preparar mensaje
 
   if (dataemail.html == true) {

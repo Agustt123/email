@@ -28,7 +28,16 @@ app.use(cors({
     allowedHeaders: ['Content-Type'], // Permitir ciertos encabezados
 }));
 const router = require('./route/email');
+app.get('/ping', (req, res) => {
+    const start = process.hrtime.bigint();
+    const end = process.hrtime.bigint();
 
+    let ms = Number(end - start) / 1_000_000;
+
+    if (ms < 1) ms = 1;
+
+    res.send(Math.round(ms).toString());
+});
 app.use('/api', router);
 
 // Importar rutas
