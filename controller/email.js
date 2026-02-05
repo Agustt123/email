@@ -55,7 +55,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
     };
 
   }
-  if (dataemail.html == true && dataemail.html_content == null && dataemail.html_content == undefined && dataemail.html_content == false) {
+  if (dataemail.html == true && dataemail.idempresa == 217 && dataemail.html_content == null && dataemail.html_content == undefined && dataemail.html_content == false) {
     console.log("enrtrerer");
 
 
