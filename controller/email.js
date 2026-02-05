@@ -44,13 +44,13 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
   let mensaje;
   // 2) Preparar mensaje
   if (dataemail.html_content) {
-
+    let html1 = dataemail.html_content
     mensaje = {
       from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
       to: fmt(dataemail.destinatario),
       cc: fmt(dataemail.copia),
       subject: dataemail.asunto || 'Tu pedido fue despachado 🚚',
-      html,
+      html1,
       text: toText(dataemail.html_content),
     };
 
