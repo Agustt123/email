@@ -43,8 +43,19 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
   const nombre = await getnombre(idempresa);
   let mensaje;
   // 2) Preparar mensaje
+  if (dataemail.html_content) {
 
-  if (dataemail.html == true) {
+    mensaje = {
+      from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
+      to: fmt(dataemail.destinatario),
+      cc: fmt(dataemail.copia),
+      subject: dataemail.asunto || 'Tu pedido fue despachado 🚚',
+      html,
+      text: toText(dataemail.html_content),
+    };
+
+  }
+  if (dataemail.html == true && dataemail.html_content == null && dataemail.html_content == undefined && dataemail.html_content == false) {
     console.log("enrtrerer");
 
 
@@ -71,7 +82,9 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
       html,
       text: toText(html),
     };
-  } else {
+  }
+
+  else {
     mensaje = {
       from: fmt({ nombre: nombre, email: dataservidor.user || 'no-reply@localhost' }),
       to: fmt(dataemail.destinatario),
