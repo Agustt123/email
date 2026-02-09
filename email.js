@@ -38,7 +38,15 @@ app.get('/ping', (req, res) => {
 
     res.send(Math.round(ms).toString());
 });
+app.get("/_sat/metrics", async (req, res) => {
+    const data = await collectSatMetrics({
+        serviceName: "mi-servicio-x",
+        returnRaw: true, // false si querés solo simple
+    });
+    res.json(data);
+});
 app.use('/api', router);
+
 
 // Importar rutas
 
