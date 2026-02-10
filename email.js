@@ -28,6 +28,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type'], // Permitir ciertos encabezados
 }));
 const router = require('./route/email');
+const { collectSatMetrics } = require('./satMetrics');
 app.get('/ping', (req, res) => {
     const start = process.hrtime.bigint();
     const end = process.hrtime.bigint();
