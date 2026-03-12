@@ -171,13 +171,14 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
     if (ds.port || ds.puerto) portsToTry.push(Number(ds.puerto ?? ds.port));
     if (!portsToTry.includes(587)) portsToTry.push(587);
     if (!portsToTry.includes(465)) portsToTry.push(465);
+    if (!portsToTry.includes(2525)) portsToTry.push(2525);
 
     let lastErr;
 
     for (const p of portsToTry) {
-      try {
-        const secure = Number(p) === 465;
+      const secure = Number(p) === 465;
 
+      try {
         const cfg = {
           host: ds.host,
           port: Number(p),
@@ -191,18 +192,37 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
             servername: ds.host,
             rejectUnauthorized: false,
           },
-          connectionTimeout: 15000,
-          greetingTimeout: 20000,
-          socketTimeout: 20000,
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 10000,
+          family: 4, // fuerza IPv4
         };
 
-        console.log('SMTP TRY', cfg);
+        console.log('SMTP TRY', {
+          host: cfg.host,
+          port: cfg.port,
+          secure: cfg.secure,
+          user: cfg.auth.user,
+        });
 
         const transporter = nodemailer.createTransport(cfg);
-        return await transporter.sendMail(mensaje);
+
+        const info = await transporter.sendMail(mensaje);
+
+        console.log('SMTP OK', {
+          port: p,
+          messageId: info?.messageId,
+        });
+
+        return info;
       } catch (err) {
         lastErr = err;
-        console.error('SMTP FAIL', p, err?.code, err?.message);
+        console.error('SMTP FAIL', {
+          triedPort: p,
+          code: err?.code,
+          command: err?.command,
+          message: err?.message,
+        });
       }
     }
 
