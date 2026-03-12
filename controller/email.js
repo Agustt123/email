@@ -37,6 +37,12 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
   let dataservidor;
   try {
     dataservidor = await getSmtpConfig(connection, idempresa, false);
+    console.log("SMTP DEBUG", {
+      host: dataservidor.host,
+      port: dataservidor.port || dataservidor.puerto,
+      user: dataservidor.user,
+      secure: dataservidor.secure
+    });
   } catch (e) {
     return { ok: false, updated: false, error: e.message || String(e) };
   }
@@ -162,10 +168,7 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
   async function trySend(ds) {
     const portsToTry = [];
 
-    // 1) primero el puerto que venga en ds
     if (ds.port || ds.puerto) portsToTry.push(Number(ds.puerto ?? ds.port));
-
-    // 2) fallback típico
     if (!portsToTry.includes(587)) portsToTry.push(587);
     if (!portsToTry.includes(465)) portsToTry.push(465);
 
@@ -173,30 +176,33 @@ async function notificarEnvio({ idempresa, idlinea, dataemail }, connection, log
 
     for (const p of portsToTry) {
       try {
-        const attempt = { ...ds, port: p, puerto: p };
-        const cfg = buildTransporterConfig(attempt);
+        const secure = Number(p) === 465;
+
+        const cfg = {
+          host: ds.host,
+          port: Number(p),
+          secure,
+          auth: {
+            user: ds.user,
+            pass: ds.pass,
+          },
+          tls: {
+            minVersion: 'TLSv1.2',
+            servername: ds.host,
+            rejectUnauthorized: false,
+          },
+          connectionTimeout: 15000,
+          greetingTimeout: 20000,
+          socketTimeout: 20000,
+        };
+
+        console.log('SMTP TRY', cfg);
 
         const transporter = nodemailer.createTransport(cfg);
-
-        // verify ayuda a fallar rápido si no hay saludo/auth
-        await transporter.verify();
-
         return await transporter.sendMail(mensaje);
       } catch (err) {
         lastErr = err;
-
-        const code = String(err?.code || "");
-        const msg = String(err?.message || "");
-
-        const retryable =
-          code === "ETIMEDOUT" ||
-          code === "ECONNRESET" ||
-          code === "ESOCKET" ||
-          msg.includes("Greeting never received") ||
-          msg.includes("CONN");
-
-        // si no es retryable (ej: auth), cortamos
-        if (!retryable) break;
+        console.error('SMTP FAIL', p, err?.code, err?.message);
       }
     }
 
