@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const mailOptions = {
-  from: '"Tu Pedido - Tornus Logística" <tupedido@tornuslogistica.com.ar>',
+  from: '"Tu Pedido - Tornus Logística" <coordinacion@tornuslogistica.com.ar>',
   to: "christian.marassi@gmail.com",
   subject: "Email de prueba",
   text: "Este es un email de prueba enviado desde Node.js con Nodemailer.",
@@ -22,9 +22,9 @@ const mailOptions = {
       <p>Este es un email de prueba enviado desde <strong>Node.js</strong> usando Nodemailer.</p>
       <p>Configuración utilizada:</p>
       <ul>
-        <li>Servidor: l4000088.ferozo.com</li>
+        <li>Servidor: smtp.gmail.com</li>
         <li>Puerto: 465 (SSL)</li>
-        <li>Remitente: tupedido@tornuslogistica.com.ar</li>
+        <li>Remitente: coordinacion@tornuslogistica.com.ar</li>
       </ul>
       <hr />
       <small style="color: gray;">Tornus Logística</small>
