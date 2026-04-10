@@ -39,7 +39,7 @@ async function enviarEmail() {
     console.log("✅ Email enviado correctamente.");
     console.log("Message ID:", info.messageId);
   } catch (error) {
-    console.error("❌ Error al enviar el email:", error.message);
+    console.error("❌ Error al enviar el email:", error);
   }
 }
 
