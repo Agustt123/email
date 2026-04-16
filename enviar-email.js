@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 const mailOptions = {
   from: '"Tu Pedido - Tornus Logística" <coordinacion@tornuslogistica.com.ar>',
-  to: "christian.marassi@gmail.com",
+  to: "agustintracheskyoficial@gmail.com",
   subject: "Email de prueba",
   text: "Este es un email de prueba enviado desde Node.js con Nodemailer.",
   html: `
